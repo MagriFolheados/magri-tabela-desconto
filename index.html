@@ -342,11 +342,11 @@
   </div>
 
 <script>
-const ACCESS_PASSWORD = "magri2026";
-const UNLOCK_KEY = "magri_tabela_unlocked";
+var ACCESS_PASSWORD = "magri2026";
+var UNLOCK_KEY = "magri_tabela_unlocked";
 
 function tryUnlock(){
-  const val = document.getElementById('pwInput').value;
+  var val = document.getElementById('pwInput').value;
   if(val === ACCESS_PASSWORD){
     localStorage.setItem(UNLOCK_KEY, "1");
     document.body.classList.remove('locked');
@@ -360,7 +360,7 @@ function tryUnlock(){
 
 document.getElementById('pwSubmit').addEventListener('click', tryUnlock);
 document.getElementById('pwInput').addEventListener('keydown', function(e){
-  if(e.key === 'Enter') tryUnlock();
+  if(e.key === 'Enter'){ tryUnlock(); }
 });
 
 if(localStorage.getItem(UNLOCK_KEY) === "1"){
@@ -373,9 +373,64 @@ function fmt(n){
 }
 
 function render(){
-  const au = parseFloat(document.getElementById('auInput').value) || 0;
-  const mo = parseFloat(document.getElementById('moInput').value) || 0;
-  const desc = (parseFloat(document.getElementById('descInput').value) || 0) / 100;
-  const showSavings = document.getElementById('showSavings').checked;
+  var au = parseFloat(document.getElementById('auInput').value) || 0;
+  var mo = parseFloat(document.getElementById('moInput').value) || 0;
+  var desc = (parseFloat(document.getElementById('descInput').value) || 0) / 100;
+  var showSavings = document.getElementById('showSavings').checked;
   document.getElementById('dateTag').textContent = document.getElementById('dataLive').value;
-  document.getElementById('econHeader').style.display = sh
+  document.getElementById('econHeader').style.display = showSavings ? '' : 'none';
+
+  var body = document.getElementById('tableBody');
+  body.innerHTML = '';
+
+  for(var camada = 2; camada <= 15; camada++){
+    var normalKg = au * (camada + mo);
+    var normalGr = normalKg / 1000;
+    var descKg = au * (camada + mo * (1 - desc));
+    var descGr = descKg / 1000;
+    var economia = normalKg - descKg;
+
+    var tr = document.createElement('tr');
+    var tdCamada = document.createElement('td');
+    tdCamada.className = 'camada';
+    tdCamada.textContent = camada;
+    tr.appendChild(tdCamada);
+
+    var tdNormalKg = document.createElement('td');
+    tdNormalKg.className = 'normal-kg';
+    tdNormalKg.textContent = fmt(normalKg);
+    tr.appendChild(tdNormalKg);
+
+    var tdNormalGr = document.createElement('td');
+    tdNormalGr.className = 'normal-gr';
+    tdNormalGr.textContent = fmt(normalGr);
+    tr.appendChild(tdNormalGr);
+
+    var tdDescKg = document.createElement('td');
+    tdDescKg.className = 'desc-kg';
+    tdDescKg.textContent = fmt(descKg);
+    tr.appendChild(tdDescKg);
+
+    var tdDescGr = document.createElement('td');
+    tdDescGr.className = 'desc-gr';
+    tdDescGr.textContent = fmt(descGr);
+    tr.appendChild(tdDescGr);
+
+    var tdEconomia = document.createElement('td');
+    tdEconomia.className = 'economia';
+    tdEconomia.style.display = showSavings ? '' : 'none';
+    tdEconomia.textContent = fmt(economia);
+    tr.appendChild(tdEconomia);
+
+    body.appendChild(tr);
+  }
+}
+
+var contentInputs = document.querySelectorAll('#content input');
+for(var i = 0; i < contentInputs.length; i++){
+  contentInputs[i].addEventListener('input', render);
+}
+render();
+</script>
+</body>
+</html>
