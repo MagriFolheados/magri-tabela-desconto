@@ -22,7 +22,7 @@
     color:#1f2330;
   }
   .card{
-    max-width:880px;
+    max-width:960px;
     margin:0 auto;
     background:#fff;
     border-radius:14px;
@@ -96,8 +96,14 @@
     color:#444;
     font-weight:500;
   }
-  .savings-toggle{
+  .toggles-group{
     margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .savings-toggle{
     align-self:center;
     display:flex;
     align-items:center;
@@ -105,6 +111,7 @@
     font-size:13px;
     color:var(--navy);
     font-weight:600;
+    white-space:nowrap;
   }
   table{
     width:100%;
@@ -149,6 +156,10 @@
   }
   td.economia{
     color:#b3261e;
+    font-weight:600;
+  }
+  td.economia-gr{
+    color:#0d9488;
     font-weight:600;
   }
   .wrap-table{
@@ -258,7 +269,7 @@
     .header .brand{ text-align:left; font-size:22px; }
     .controls{ padding:16px 18px; gap:12px; }
     .field input{ width:120px; padding:8px 10px; font-size:14px; }
-    .savings-toggle{ margin-left:0; width:100%; }
+    .toggles-group{ margin-left:0; width:100%; gap:12px; }
     table{ font-size:12px; }
     thead th{ padding:8px 4px; font-size:10.5px; }
     tbody td{ padding:7px 4px; }
@@ -308,10 +319,16 @@
         <label>Desconto MO (%)</label>
         <input id="descInput" type="number" step="1" value="50">
       </div>
-      <label class="savings-toggle">
-        <input type="checkbox" id="showSavings" checked style="width:auto;">
-        Mostrar economia
-      </label>
+      <div class="toggles-group">
+        <label class="savings-toggle">
+          <input type="checkbox" id="showSavings" checked style="width:auto;">
+          Mostrar economia
+        </label>
+        <label class="savings-toggle">
+          <input type="checkbox" id="showSavingsGram" checked style="width:auto;">
+          Economia em gramas
+        </label>
+      </div>
     </div>
 
     <div class="wrap-table">
@@ -322,6 +339,7 @@
             <th colspan="2">Valor Normal MO</th>
             <th colspan="2">Valor MO com Desconto</th>
             <th id="econHeader" rowspan="2">Economia (R$/kg)</th>
+            <th id="econHeaderGram" rowspan="2">Economia (R$/g)</th>
           </tr>
           <tr>
             <th>MO KG</th>
@@ -377,8 +395,10 @@ function render(){
   var mo = parseFloat(document.getElementById('moInput').value) || 0;
   var desc = (parseFloat(document.getElementById('descInput').value) || 0) / 100;
   var showSavings = document.getElementById('showSavings').checked;
+  var showSavingsGram = document.getElementById('showSavingsGram').checked;
   document.getElementById('dateTag').textContent = document.getElementById('dataLive').value;
   document.getElementById('econHeader').style.display = showSavings ? '' : 'none';
+  document.getElementById('econHeaderGram').style.display = showSavingsGram ? '' : 'none';
 
   var body = document.getElementById('tableBody');
   body.innerHTML = '';
@@ -388,7 +408,8 @@ function render(){
     var normalGr = normalKg / 1000;
     var descKg = au * (camada + mo * (1 - desc));
     var descGr = descKg / 1000;
-    var economia = normalKg - descKg;
+    var economiaKg = normalKg - descKg;
+    var economiaGr = economiaKg / 1000;
 
     var tr = document.createElement('tr');
     var tdCamada = document.createElement('td');
@@ -419,8 +440,14 @@ function render(){
     var tdEconomia = document.createElement('td');
     tdEconomia.className = 'economia';
     tdEconomia.style.display = showSavings ? '' : 'none';
-    tdEconomia.textContent = fmt(economia);
+    tdEconomia.textContent = fmt(economiaKg);
     tr.appendChild(tdEconomia);
+
+    var tdEconomiaGr = document.createElement('td');
+    tdEconomiaGr.className = 'economia-gr';
+    tdEconomiaGr.style.display = showSavingsGram ? '' : 'none';
+    tdEconomiaGr.textContent = fmt(economiaGr);
+    tr.appendChild(tdEconomiaGr);
 
     body.appendChild(tr);
   }
