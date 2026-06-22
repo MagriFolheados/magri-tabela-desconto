@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Magri Folheados - Tabela de Desconto</title>
+<style>
+  :root{
+    color-scheme: light;
+    --navy:#1b2a52;
+    --gold:#c9a227;
+    --gold-light:#f4e9c9;
+    --gray:#6b7280;
+    --line:#e3e6ee;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:#f5f6fa;
+    margin:0;
+    padding:30px;
+    color:#1f2330;
+  }
+  .card{
+    max-width:880px;
+    margin:0 auto;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(20,30,60,0.08);
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .header{
+    background:linear-gradient(135deg, var(--navy) 0%, #2c3f72 100%);
+    color:#fff;
+    padding:26px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .header h1{
+    margin:0;
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:.3px;
+  }
+  .header .brand{
+    font-family:Georgia, 'Times New Roman', serif;
+    font-style:italic;
+    font-size:26px;
+    color:var(--gold);
+    text-align:right;
+  }
+  .brand small{
+    display:block;
+    font-style:normal;
+    font-size:11px;
+    letter-spacing:2px;
+    color:#dfe3ef;
+  }
+  .controls{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    padding:22px 32px;
+    background:var(--gold-light);
+    border-bottom:1px solid var(--line);
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    color:var(--navy);
+    font-weight:600;
+  }
+  .field input{
+    width:160px;
+    padding:9px 12px;
+    border:1.5px solid var(--gold);
+    border-radius:8px;
+    font-size:15px;
+    font-weight:600;
+    color:var(--navy);
+    background:#fff;
+  }
+  .field input:focus{
+    outline:none;
+    box-shadow:0 0 0 3px rgba(201,162,39,0.25);
+  }
+  .field.date input{
+    color:#444;
+    font-weight:500;
+  }
+  .savings-toggle{
+    margin-left:auto;
+    align-self:center;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--navy);
+    font-weight:600;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  thead th{
+    background:var(--navy);
+    color:#fff;
+    padding:12px 10px;
+    text-align:center;
+    font-weight:600;
+    font-size:12.5px;
+    letter-spacing:.3px;
+  }
+  thead tr.group th{
+    background:#27396b;
+    font-size:13px;
+  }
+  tbody td{
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+  }
+  tbody tr:nth-child(even){
+    background:#fafbfd;
+  }
+  tbody tr:hover{
+    background:#f1f4ff;
+  }
+  td.camada{
+    font-weight:700;
+    color:var(--navy);
+    background:#f8f5e8 !important;
+  }
+  td.normal-kg, td.normal-gr{
+    color:#3a3f4b;
+  }
+  td.desc-kg, td.desc-gr{
+    color:#157347;
+    font-weight:600;
+  }
+  td.economia{
+    color:#b3261e;
+    font-weight:600;
+  }
+  .wrap-table{
+    padding:0 0 10px 0;
+    overflow-x:auto;
+  }
+  .footer{
+    padding:16px 32px 26px;
+    font-size:12px;
+    color:var(--gray);
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .footer .tag{
+    background:var(--navy);
+    color:#fff;
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+  }
+
+  /* Lock screen */
+  #lockOverlay{
+    position:fixed;
+    inset:0;
+    background:rgba(27,42,82,0.92);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+  }
+  .lock-box{
+    background:#fff;
+    border-radius:14px;
+    padding:36px 40px;
+    width:320px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+  }
+  .lock-box .brand{
+    font-family:Georgia, 'Times New Roman', serif;
+    font-style:italic;
+    font-size:28px;
+    color:var(--gold);
+    margin-bottom:2px;
+  }
+  .lock-box .brand small{
+    display:block;
+    font-style:normal;
+    font-size:10px;
+    letter-spacing:2px;
+    color:var(--navy);
+  }
+  .lock-box p{
+    font-size:13px;
+    color:var(--gray);
+    margin:14px 0 18px;
+  }
+  .lock-box input{
+    width:100%;
+    padding:11px 12px;
+    border:1.5px solid var(--gold);
+    border-radius:8px;
+    font-size:15px;
+    text-align:center;
+    margin-bottom:12px;
+  }
+  .lock-box input:focus{
+    outline:none;
+    box-shadow:0 0 0 3px rgba(201,162,39,0.25);
+  }
+  .lock-box button{
+    width:100%;
+    padding:11px;
+    border:none;
+    border-radius:8px;
+    background:var(--navy);
+    color:#fff;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .lock-box button:hover{
+    background:#27396b;
+  }
+  .lock-error{
+    color:#b3261e;
+    font-size:12.5px;
+    margin-top:10px;
+    min-height:16px;
+  }
+  #content{
+    filter:blur(0);
+  }
+  body.locked #content{
+    visibility:hidden;
+  }
+</style>
+</head>
+<body class="locked">
+
+  <div id="lockOverlay">
+    <div class="lock-box">
+      <div class="brand">Magri<small>FOLHEADOS</small></div>
+      <p>Esta tabela &eacute; restrita. Informe a senha de acesso.</p>
+      <input id="pwInput" type="password" placeholder="Senha" autofocus>
+      <button id="pwSubmit">Acessar</button>
+      <div class="lock-error" id="pwError"></div>
+    </div>
+  </div>
+
+  <div id="content">
+  <div class="card">
+    <div class="header">
+      <h1>Tabela de Desconto &mdash; Live</h1>
+      <div class="brand">Magri<small>FOLHEADOS</small></div>
+    </div>
+
+    <div class="controls">
+      <div class="field date">
+        <label>Data</label>
+        <input id="dataLive" type="text" value="22/06/2026">
+      </div>
+      <div class="field">
+        <label>Cota&ccedil;&atilde;o AU (R$)</label>
+        <input id="auInput" type="number" step="0.01" value="696.00">
+      </div>
+      <div class="field">
+        <label>MO</label>
+        <input id="moInput" type="number" step="0.1" value="3.5">
+      </div>
+      <div class="field">
+        <label>Desconto MO (%)</label>
+        <input id="descInput" type="number" step="1" value="50">
+      </div>
+      <label class="savings-toggle">
+        <input type="checkbox" id="showSavings" checked style="width:auto;">
+        Mostrar economia
+      </label>
+    </div>
+
+    <div class="wrap-table">
+      <table>
+        <thead>
+          <tr class="group">
+            <th rowspan="2">Camada</th>
+            <th colspan="2">Valor Normal MO</th>
+            <th colspan="2">Valor MO com Desconto</th>
+            <th id="econHeader" rowspan="2">Economia (R$/kg)</th>
+          </tr>
+          <tr>
+            <th>MO KG</th>
+            <th>MO GR</th>
+            <th>MO KG</th>
+            <th>MO GR</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      <span>Magri Folheados &bull; valores recalculados automaticamente conforme cota&ccedil;&atilde;o do dia</span>
+      <span class="tag" id="dateTag">22/06/2026</span>
+    </div>
+  </div>
+  </div>
+
+<script>
+const ACCESS_PASSWORD = "magri2026";
+const UNLOCK_KEY = "magri_tabela_unlocked";
+
+function tryUnlock(){
+  const val = document.getElementById('pwInput').value;
+  if(val === ACCESS_PASSWORD){
+    localStorage.setItem(UNLOCK_KEY, "1");
+    document.body.classList.remove('locked');
+    document.getElementById('lockOverlay').style.display = 'none';
+  } else {
+    document.getElementById('pwError').textContent = "Senha incorreta. Tente novamente.";
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+document.getElementById('pwSubmit').addEventListener('click', tryUnlock);
+document.getElementById('pwInput').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') tryUnlock();
+});
+
+if(localStorage.getItem(UNLOCK_KEY) === "1"){
+  document.body.classList.remove('locked');
+  document.getElementById('lockOverlay').style.display = 'none';
+}
+
+function fmt(n){
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function render(){
+  const au = parseFloat(document.getElementById('auInput').value) || 0;
+  const mo = parseFloat(document.getElementById('moInput').value) || 0;
+  const desc = (parseFloat(document.getElementById('descInput').value) || 0) / 100;
+  const showSavings = document.getElementById('showSavings').checked;
+  document.getElementById('dateTag').textContent = document.getElementById('dataLive').value;
+  document.getElementById('econHeader').style.display = showSavings ? '' : 'none';
+
+  const body = document.getElementById('tableBody');
+  body.innerHTML = '';
+
+  for(let camada = 2; camada <= 15; camada++){
+    const normalKg = au * (camada + mo);
+    const normalGr = normalKg / 1000;
+    const descKg = au * (camada + mo * (1 - desc));
+    const descGr = descKg / 1000;
+    const economia = normalKg - descKg;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="camada">${camada}</td>
+      <td class="normal-kg">${fmt(normalKg)}</td>
+      <td class="normal-gr">${fmt(normalGr)}</td>
+      <td class="desc-kg">${fmt(descKg)}</td>
+      <td class="desc-gr">${fmt(descGr)}</td>
+      <td class="economia" style="${showSavings ? '' : 'display:none;'}">${fmt(economia)}</td>
+    `;
+    body.appendChild(tr);
+  }
+}
+
+document.querySelectorAll('#content input').forEach(el => el.addEventListener('input', render));
+render();
+</script>
+</body>
+</html>
