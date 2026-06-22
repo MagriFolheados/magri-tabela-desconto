@@ -22,7 +22,7 @@
     color:#1f2330;
   }
   .card{
-    max-width:960px;
+    max-width:1000px;
     margin:0 auto;
     background:#fff;
     border-radius:14px;
@@ -111,6 +111,45 @@
     font-size:13px;
     color:var(--navy);
     font-weight:600;
+    white-space:nowrap;
+  }
+  .addons-group{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+    padding-top:16px;
+    margin-top:2px;
+    border-top:1px dashed rgba(27,42,82,0.25);
+  }
+  .addons-label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    color:var(--navy);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .addon-toggle{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    color:var(--navy);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .addon-toggle .addon-price{
+    color:var(--gray);
+    font-weight:500;
+    font-size:12px;
+  }
+  .addons-total{
+    margin-left:auto;
+    font-size:12.5px;
+    font-weight:700;
+    color:#157347;
     white-space:nowrap;
   }
   table{
@@ -270,6 +309,9 @@
     .controls{ padding:16px 18px; gap:12px; }
     .field input{ width:120px; padding:8px 10px; font-size:14px; }
     .toggles-group{ margin-left:0; width:100%; gap:12px; }
+    .addons-group{ gap:12px; padding-top:14px; }
+    .addon-toggle{ font-size:12px; }
+    .addons-total{ margin-left:0; width:100%; }
     table{ font-size:12px; }
     thead th{ padding:8px 4px; font-size:10.5px; }
     tbody td{ padding:7px 4px; }
@@ -329,6 +371,23 @@
           Economia em gramas
         </label>
       </div>
+
+      <div class="addons-group">
+        <span class="addons-label">Adicionais (R$/kg):</span>
+        <label class="addon-toggle">
+          <input type="checkbox" id="addonHipo" data-price="70" style="width:auto;">
+          Hipoalerg&ecirc;nico <span class="addon-price">R$ 70,00</span>
+        </label>
+        <label class="addon-toggle">
+          <input type="checkbox" id="addonCataforetico" data-price="420" style="width:auto;">
+          Verniz Cataforético <span class="addon-price">R$ 420,00</span>
+        </label>
+        <label class="addon-toggle">
+          <input type="checkbox" id="addonProtetor" data-price="210" style="width:auto;">
+          Verniz Protetor <span class="addon-price">R$ 210,00</span>
+        </label>
+        <span class="addons-total" id="addonsTotalLabel"></span>
+      </div>
     </div>
 
     <div class="wrap-table">
@@ -353,7 +412,7 @@
     </div>
 
     <div class="footer">
-      <span>Magri Folheados &bull; valores recalculados automaticamente conforme cota&ccedil;&atilde;o do dia</span>
+      <span>Magri Folheados &bull; valores recalculados automaticamente conforme cota&ccedil;&atilde;o do dia. Colunas MO KG/GR incluem os adicionais selecionados.</span>
       <span class="tag" id="dateTag">22/06/2026</span>
     </div>
   </div>
@@ -400,13 +459,23 @@ function render(){
   document.getElementById('econHeader').style.display = showSavings ? '' : 'none';
   document.getElementById('econHeaderGram').style.display = showSavingsGram ? '' : 'none';
 
+  var addonInputs = document.querySelectorAll('.addon-toggle input[type="checkbox"]');
+  var addonsPerKg = 0;
+  for(var k = 0; k < addonInputs.length; k++){
+    if(addonInputs[k].checked){
+      addonsPerKg += parseFloat(addonInputs[k].getAttribute('data-price')) || 0;
+    }
+  }
+  var addonsLabel = document.getElementById('addonsTotalLabel');
+  addonsLabel.textContent = addonsPerKg > 0 ? ('Adicionais selecionados: R$ ' + fmt(addonsPerKg) + '/kg') : '';
+
   var body = document.getElementById('tableBody');
   body.innerHTML = '';
 
   for(var camada = 2; camada <= 15; camada++){
-    var normalKg = au * (camada + mo);
+    var normalKg = au * (camada + mo) + addonsPerKg;
     var normalGr = normalKg / 1000;
-    var descKg = au * (camada + mo * (1 - desc));
+    var descKg = au * (camada + mo * (1 - desc)) + addonsPerKg;
     var descGr = descKg / 1000;
     var economiaKg = normalKg - descKg;
     var economiaGr = economiaKg / 1000;
